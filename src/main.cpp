@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
 
 static std::string readFile(const std::string &filename) {
     std::ifstream file(filename);
@@ -25,6 +26,18 @@ int main(int argc, char *argv[]) {
     Lexer lexer;
     auto tokens = lexer.tokenize(input);
     lexer.print(tokens);
+
+    std::cout << std::endl;
+    std::cout << "Parser: " << std::endl;
+    
+    Parser parser(tokens);
+    auto ast = parser.parse();
+
+    std::cout << "AST: " << std::endl;
+    for (const auto& stmt : ast) {
+        stmt->print();
+	    std::cout << std::endl;
+    } 
 
     return 0;
 }
