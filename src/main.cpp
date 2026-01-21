@@ -2,9 +2,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
+#include "logger/logging.hpp"
 
 static std::string readFile(const std::string &filename) {
     std::ifstream file(filename);
@@ -22,6 +24,11 @@ int main(int argc, char *argv[]) {
 
     std::string filePath = argv[argc-1];
     std::string input = readFile(filePath);
+
+    system("./../script.sh");
+    Logger logger("../log/app.log");
+
+    logger.log(INFO, "Program start.");
 
     Lexer lexer;
     auto tokens = lexer.tokenize(input);
