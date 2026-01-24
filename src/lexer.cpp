@@ -261,9 +261,6 @@ void Lexer::print(std::vector<Token>& tokens) {
                 break;
         }
         std::cout << "\t -> '" << token.text << "'";
-        if (token.type == Token::Type::Number) {
-            std::cout << " (value: " << token.value << ")";
-        }
         std::cout << std::endl;
     }
 }

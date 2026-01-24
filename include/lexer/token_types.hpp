@@ -26,5 +26,4 @@ struct Token {
 
     Type            type = Type::Unknown;
     std::string     text = "";
-    double          value = 0.0;
 };
