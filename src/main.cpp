@@ -7,6 +7,7 @@
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 #include "logger/logging.hpp"
+#include "cli/arg_parser.hpp"
 
 static std::string readFile(const std::string &filename) {
     std::ifstream file(filename);
@@ -21,6 +22,12 @@ static std::string readFile(const std::string &filename) {
 }
 
 int main(int argc, char *argv[]) {
+
+    ArgumentParser argParser;
+    if (!argParser.parse(argc, argv)) {
+        std::cerr << "Error: Failed to parse command line arguments." << std::endl;
+        return 1;
+    }
 
     std::string filePath = argv[argc-1];
     std::string input = readFile(filePath);
