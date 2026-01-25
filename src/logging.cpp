@@ -32,3 +32,64 @@ std::string Logger::stringLogType(LogType type) {
             return "UNKNOWN";
     }
 }
+
+void Logger::lexerLog(std::vector<Token>& tokens) {
+    for (const auto& token : tokens) {
+        logFile << "Token: ";
+        switch (token.type) {
+            case Token::Type::Number:
+                logFile << "Number      ";
+                break;
+            case Token::Type::String:
+                logFile << "String      ";
+                break;
+            case Token::Type::LeftParenthesis:
+                logFile << "LeftParenthesis";
+                break;
+            case Token::Type::RightParenthesis:
+                logFile << "RightParenthesis";
+                break;
+            case Token::Type::Semicolon:
+                logFile << "Semicolon    ";
+                break;
+            case Token::Type::Comma:
+                logFile << "Comma        ";
+                break;
+            case Token::Type::Plus:
+                logFile << "Plus        ";
+                break;
+            case Token::Type::Minus:
+                logFile << "Minus       ";
+                break;
+            case Token::Type::Mult:
+                logFile << "Mult        ";
+                break;
+            case Token::Type::Div:
+                logFile << "Div         ";
+                break;
+            case Token::Type::Equal:
+                logFile << "Equal       ";
+                break;
+            case Token::Type::Less:
+                logFile << "Less        ";
+                break;
+            case Token::Type::Greater:
+                logFile << "Greater     ";
+                break;
+            case Token::Type::Operator:
+                logFile << "Operator    ";
+                break;
+            case Token::Type::Identifier:
+                logFile << "Identifier  ";
+                break;
+            case Token::Type::Keyword:
+                logFile << "Keyword     ";
+                break;
+            case Token::Type::Unknown:
+                logFile << "Unknown     ";
+                break;
+        }
+        logFile << "\t\t -> '" << token.text << "'";
+        logFile << std::endl;
+    }
+}

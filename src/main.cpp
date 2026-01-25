@@ -33,12 +33,15 @@ int main(int argc, char *argv[]) {
     std::string input = readFile(filePath);
 
     system("./../script.sh");
-    Logger logger("../log/app.log");
+    Logger logger("../log/app.log", WRITE);
 
     logger.log(INFO, "Program start.");
 
+    Logger lexerLog("../log/lexer.log", REWRITE);
     Lexer lexer;
     auto tokens = lexer.tokenize(input);
+    
+    lexerLog.lexerLog(tokens);
     lexer.print(tokens);
 
     std::cout << std::endl;
