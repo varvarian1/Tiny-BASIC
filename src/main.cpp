@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
     auto tokens = lexer.tokenize(input);
     
     lexerLog.lexerLog(tokens);
-    lexer.print(tokens);
 
     std::cout << std::endl;
     std::cout << "Parser: " << std::endl;

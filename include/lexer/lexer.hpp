@@ -20,7 +20,6 @@ public:
     }
 
     std::vector<Token> tokenize(std::string& input);
-    void print(std::vector<Token>& tokens);
 
 private:
     std::unordered_map<std::string, Keyword> keywords_map;
