@@ -11,5 +11,6 @@ public:
 
     bool parse(int argc, char **argv);
     void help();
+    void readLog(std::string filename);
 
 };
