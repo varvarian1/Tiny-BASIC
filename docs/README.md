@@ -1,22 +1,28 @@
-# Tiny BASIC Compiler
+# Tiny BASIC Interpreter
 
-A step-bu-step Tiny BASIC compiler. Starting with lexer - educational and open for contributions!
+A step-bu-step Tiny BASIC interpreter. Starting with lexer - educational and open for contributions!
 
 ### What has been implemented now and what is planned
 
 - [x] Lexical Analyzer (Lexer)
-- [ ] Syntax Analyzer (Parser)
-    - [ ] Recursive descent parsing
-    - [ ] Abstract Syntax Tree (AST) 
-- [ ] Semantic Analysis
-    - [ ] Label and jump validation (GOTO, GOSUB)
-- [ ] Code Generation
+- [x] Syntax Analyzer (Parser)
+    - [x] Recursive descent parsing
+    - [x] Abstract Syntax Tree (AST)
+- [x] Interpreter
+    - [x] Expression evaluation
+    - [x] Variable assignment (LET)
+    - [x] Output (PRINT)
+    - [ ] Conditional statements (IF-THEN)
+    - [ ] Loops (FOR-NEXT)
+    - [ ] User input (INPUT)
 
 ### Example
 
 ```bash
 10 LET A = 5 + 2 * (2 * 1) * (5 * 1)
-20 PRINT A
+20 LET B = 3 * 3 + 2
+30 PRINT A
+40 PRINT B
 ```
 
 ### Lexer Output
@@ -64,6 +70,15 @@ LetStmt: A=
 
 PrintStmt: 
   Variable: A
+```
+
+### Program Execution
+
+```bash
+Execute: 
+25
+11
+End of program.
 ```
 
 ### Quick Start
