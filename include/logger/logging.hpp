@@ -10,7 +10,8 @@
 enum LogType {
     INFO,
     ERROR,
-    WARNING
+    WARNING,
+    DEBUG
 };
 
 enum Mode {

@@ -28,6 +28,8 @@ std::string Logger::stringLogType(LogType type) {
             return "ERROR";
         case WARNING:
             return "WARNING";
+        case DEBUG:
+            return "DEBUG";
         default:
             return "UNKNOWN";
     }
