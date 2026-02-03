@@ -8,6 +8,7 @@
 #include "parser/parser.hpp"
 #include "logger/logging.hpp"
 #include "cli/arg_parser.hpp"
+#include "interpreter/interpreter.hpp"
 
 static std::string readFile(const std::string &filename) {
     std::ifstream file(filename);
@@ -54,6 +55,9 @@ int main(int argc, char *argv[]) {
         stmt->print();
 	    std::cout << std::endl;
     } 
+
+    Interpreter interpreter;
+    interpreter.execute(ast);
 
     return 0;
 }
