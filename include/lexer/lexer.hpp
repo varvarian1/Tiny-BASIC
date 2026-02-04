@@ -4,24 +4,35 @@
 #include <vector>
 #include <unordered_map>
 
-#include "lexer/keywords.hpp"
-#include "lexer/lookup.hpp"
 #include "lexer/token_types.hpp"
-
-struct Keyword { uint8_t placeholder_for_now = 0; };
 
 class Lexer {
 public:
 
-    Lexer() {
-        for (const auto& kw : keywords) {
-            keywords_map[kw] = Keyword{};
-        }
-    }
+    Lexer() = default;
 
     std::vector<Token> tokenize(std::string& input);
 
-private:
-    std::unordered_map<std::string, Keyword> keywords_map;
+    bool isDigit(char ch) {
+        return (unsigned char)(ch - '0') <= 9;
+    }
+
+    bool isRealNumeric(char ch) {
+        return isDigit(ch) || ch == '.';
+    }
+
+    bool isIdentifierStart(char ch) {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+    }
+    
+    bool isIdentifierChar(char ch) {
+        return isIdentifierStart(ch) || isDigit(ch);
+    }
+
+    bool isWhitespace(char ch) {
+        return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\v' || ch == '\f';
+    }
+
+    Token keywordOrIdentifier(const std::string& lexem);
 
 };

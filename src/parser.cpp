@@ -204,6 +204,6 @@ void Parser::nextToken() {
         tokenIndex++;
         currentToken = tokensVector[tokenIndex];
     } else {
-        currentToken = {Token::Type::LastToken};
+        currentToken = {Token::Type::LastToken, ""};
     }
 }

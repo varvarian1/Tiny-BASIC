@@ -26,4 +26,8 @@ struct Token {
 
     Type            type = Type::Unknown;
     std::string     text = "";
+
+    Token() = default;
+    Token(Type type, const std::string& text) : type(type), text(text) {}
+    Token(Type type, std::string&& text) : type(type), text(std::move(text)) {}
 };

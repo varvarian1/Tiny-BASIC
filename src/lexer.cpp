@@ -30,15 +30,23 @@ std::vector<Token> Lexer::tokenize(std::string& input) {
                 lexem.clear();
                 decimalPoint = false;
 
-                if (lut::Whitespace.at(*currentChar)) {
+                if (isWhitespace(*currentChar)) {
 		            ++currentChar;
                     continue;
                 }
 
-                if (lut::RealNumeric.at(*currentChar)) {
+                if (isDigit(*currentChar)) {
                     lexem += *currentChar;
                     ++currentChar;
                     currentState = State::InNumber;
+                    break;
+                }
+
+                if (isIdentifierStart(*currentChar)) {
+                    lexem += *currentChar;
+                    ++currentChar;
+                    currentState = State::InIdentifier;
+                    break;
                 }
 
                 else if (*currentChar == '=') {
@@ -83,11 +91,6 @@ std::vector<Token> Lexer::tokenize(std::string& input) {
                     currentToken = {Token::Type::Div, lexem};
                     currentState = State::InCompleteToken;
                 }
-                else if (lut::Operator.at(*currentChar)) {
-                    lexem += *currentChar;
-                    ++currentChar;
-                    currentState = State::InOperator;
-                }
                 else if (*currentChar == '(') {
                     lexem += *currentChar;
                     ++currentChar;
@@ -124,19 +127,13 @@ std::vector<Token> Lexer::tokenize(std::string& input) {
                 break;
 
             case State::InIdentifier:
-                if (lut::Identifier.at(*currentChar)) {
+                while (currentChar != input.end() && isIdentifierChar(*currentChar)) {
                     lexem += *currentChar;
                     ++currentChar;
-                } 
-                else {
-                    if (keywords_map.find(lexem) != keywords_map.end()) { 
-                        currentToken = { Token::Type::Keyword, lexem }; 
-                    }
-                    else { 
-                        currentToken = { Token::Type::Identifier, lexem }; 
-                    }
-                    currentState = State::InCompleteToken;
                 }
+
+                currentToken = keywordOrIdentifier(lexem);
+                currentState = State::InCompleteToken;
                 break;
 
             case State::InString:
@@ -151,34 +148,30 @@ std::vector<Token> Lexer::tokenize(std::string& input) {
                 break;
 
             case State::InNumber:
-                if (lut::RealNumeric.at(*currentChar)) {
+                while (currentChar != input.end() && isRealNumeric(*currentChar)) {
                     if (*currentChar == '.') {
                         if (decimalPoint) {
                             std::cerr << "{Lexer} bad numeric construction";
-                        } else {
+                        }
+                        else {
                             decimalPoint = true;
                         }
                     }
+
                     lexem += *currentChar;
                     ++currentChar;
-                } else {
-                    if (lut::Identifier.at(*currentChar)) {
-                        std::cerr << "{Lexer} Invalid number" << std::endl;
-                    }
+                }
+
+                if (currentChar != input.end() && isIdentifierStart(*currentChar)) {
+                    std::cerr << "{Lexer} Invalid number: " << lexem << *currentChar << std::endl;
+
                     currentToken = { Token::Type::Number, lexem };
                     currentState = State::InCompleteToken;
-                }
-                break;
-
-            case State::InOperator:
-                if (lut::Operator.at(*currentChar)) {
-                    lexem += *currentChar;
-                    ++currentChar;
-                } else {
-                    currentToken = { Token::Type::Operator, lexem };
-                    currentState = State::InCompleteToken;
+                    break;
                 }
 
+                currentToken = { Token::Type::Number, lexem };
+                currentState = State::InCompleteToken;
                 break;
 
             case State::InCompleteToken:
@@ -188,16 +181,64 @@ std::vector<Token> Lexer::tokenize(std::string& input) {
         }
     }
 
-    if (currentState != State::InNewToken && !lexem.empty()) {
-        if (currentState == State::InIdentifier) {
-            if (keywords_map.find(lexem) != keywords_map.end()) {
-                currentToken = { Token::Type::Keyword, lexem };
-            } else {
-                currentToken = { Token::Type::Identifier, lexem };
-            }
-        }
+    if (currentState == State::InIdentifier && !lexem.empty()) {
+        tokens.push_back(keywordOrIdentifier(lexem));
+    }
+    else if (currentState == State::InNumber && !lexem.empty()) {
+        tokens.emplace_back(Token::Type::Number, lexem);
+    }
+    else if (currentState == State::InCompleteToken) {
         tokens.push_back(currentToken);
     }
 
     return tokens;
+}
+
+Token Lexer::keywordOrIdentifier(const std::string& lexem) {
+    if (lexem.empty())
+        return { Token::Type::Identifier, lexem };
+
+    switch (lexem[0]) {
+        case 'L':
+            if (lexem == "LET")
+                return { Token::Type::Keyword, lexem };
+            break;
+            
+        case 'P':
+            if (lexem == "PRINT")
+                return { Token::Type::Keyword, lexem };
+            break;
+
+        case 'G':
+            if (lexem == "GOTO")
+                return { Token::Type::Keyword, lexem };
+            else if (lexem == "GOSUB")
+                return { Token::Type::Keyword, lexem };
+            break;
+
+        case 'I':
+            if (lexem == "IF")
+                return { Token::Type::Keyword, lexem };
+            else if (lexem == "INPUT")
+                return { Token::Type::Keyword, lexem };
+            break;
+
+        case 'T':
+            if (lexem == "THEN")
+                return { Token::Type::Keyword, lexem };
+            break;
+
+        case 'R':
+            if (lexem == "RETURN")
+                return { Token::Type::Keyword, lexem };
+            break;
+
+        case 'E':
+            if (lexem == "END")
+                return { Token::Type::Keyword, lexem };
+            break;
+                  
+    }
+
+    return { Token::Type::Identifier, lexem };
 }
