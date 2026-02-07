@@ -13,6 +13,11 @@ enum class Op {
     Divide      // /
 };
 
+enum class CompareOp {
+    Less,       // <
+    Greater     // >
+};
+
 namespace node {
     class EvaluationContext {
     public:
@@ -131,6 +136,43 @@ namespace node {
         }
     };
 
+    struct CompareExpr : Expr {
+        std::unique_ptr<Expr> left, right;
+        CompareOp op;
+        CompareExpr(std::unique_ptr<Expr> l, CompareOp op, std::unique_ptr<Expr> r)
+            : left(std::move(l)), right(std::move(r)), op(op) {}
+
+        void print(int indent = 0) const override {
+            std::cout << std::string(indent, ' ') << "CompareExpr: ";
+            switch (op) {
+                case CompareOp::Less:
+                    std::cout << "<";
+                    break;
+                case CompareOp::Greater:
+                    std::cout << ">";
+                    break;
+            }
+
+            std::cout << std::endl;
+            left->print(indent + 2);
+            right->print(indent + 2);
+        }
+
+        double evaluate(EvaluationContext& context) const override {
+            double leftValue = left->evaluate(context);
+            double rightValue = right->evaluate(context);
+
+            switch (op) {
+                case CompareOp::Less:
+                    return (leftValue < rightValue) ? 1.0 : 0.0;
+                case CompareOp::Greater:
+                    return (leftValue > rightValue) ? 1.0 : 0.0;
+                default:
+                    throw std::runtime_error("Unknown comparison operator.");
+            }
+        }
+    };
+
     // Base class for statements.
     struct Stmt {
         int lineNumber = 0;
@@ -177,6 +219,35 @@ namespace node {
             }
 
             std::cout << std::endl;
+        }
+    };
+
+    struct IfStmt : Stmt {
+        std::unique_ptr<Expr> condition;
+        std::unique_ptr<Stmt> thenStmt;
+
+        IfStmt(std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> thenStmt)
+            : condition(std::move(cond)), thenStmt(std::move(thenStmt)) {}
+
+        void print(int indent = 0) const override {
+            std::cout << std::string(indent, ' ') << "IfStmt:" << std::endl;
+            if (condition) {
+                std::cout << std::string(indent + 2, ' ') << "Condition:" << std::endl;
+                condition->print(indent + 4);
+            }
+            if (thenStmt) {
+                std::cout << std::string(indent + 2, ' ') << "Then:" << std::endl;
+                thenStmt->print(indent + 4);
+            }
+        }
+
+        void execute(EvaluationContext& context) const override {
+            double conditionValue = condition->evaluate(context);
+            
+            // 0 is false, anything else is true.
+            if (conditionValue != 0.0) {
+                thenStmt->execute(context);
+            }
         }
     };
 };

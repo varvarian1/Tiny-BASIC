@@ -31,7 +31,8 @@ public:
      */
     std::vector<std::unique_ptr<node::Stmt>> parse();
     
-    // Expression parsing methods.    
+    // Expression parsing methods.
+    std::unique_ptr<node::Expr> comparison();
     std::unique_ptr<node::Expr> expression(); // Addition and subtraction.
     std::unique_ptr<node::Expr> term();	      // Multiplication and division.
     std::unique_ptr<node::Expr> factor();     // Atomic expressions.
@@ -46,11 +47,13 @@ public:
     bool isMinus(const Token& token) const;
     bool isMultiply(const Token& token) const;
     bool isDivide(const Token& token) const;
+    bool isComparison(const Token& token) const;
 
     // Statment parsing methods.
     std::unique_ptr<node::Stmt> statement(); // General statement.
     std::unique_ptr<node::Stmt> letStmt();   // LET statement.
     std::unique_ptr<node::Stmt> printStmt(); // PRINT statement.
+    std::unique_ptr<node::Stmt> ifStmt();    // IF statement.
     
     // Token manipulation.
     void eat(Token::Type expectedType); // Consume expected token.

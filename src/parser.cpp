@@ -26,6 +26,35 @@ std::vector<std::unique_ptr<node::Stmt>> Parser::parse() {
     return statements;
 }
 
+std::unique_ptr<node::Expr> Parser::comparison() {
+    auto left = expression();
+
+    if (isComparison(currentToken)) {
+        CompareOp op;
+        switch (currentToken.type) {
+            case Token::Type::Less:
+                op = CompareOp::Less;
+                break;
+            case Token::Type::Greater:
+                op = CompareOp::Greater;
+                break;
+            default:
+                throw std::runtime_error("Expect comparison operator");
+        }
+
+        nextToken();
+        auto right = expression();
+        return std::make_unique<node::CompareExpr>(std::move(left), op, std::move(right));
+    }    
+
+    return left;
+}
+
+bool Parser::isComparison(const Token& token) const {
+    return token.type == Token::Type::Less ||
+           token.type == Token::Type::Greater;
+}
+
 // Parses addition and subtraction expressions (lowest precedence).
 std::unique_ptr<node::Expr> Parser::expression() {
     auto left = term();
@@ -50,7 +79,7 @@ std::unique_ptr<node::Expr> Parser::expression() {
         left = std::move(result);
     }
 
-    return std::move(left);
+    return left;
 }
 
 bool Parser::isPlus(const Token& token) const {
@@ -149,6 +178,9 @@ std::unique_ptr<node::Stmt> Parser::statement() {
             } else if (currentToken.text == "PRINT") {
                 nextToken();
                 stmt = printStmt();
+            } else if (currentToken.text == "IF") {
+                nextToken();
+                stmt = ifStmt();
             } else {
                 throw std::runtime_error("Unknown keyword: " + currentToken.text);
             }
@@ -187,6 +219,39 @@ std::unique_ptr<node::Stmt> Parser::letStmt() {
 std::unique_ptr<node::Stmt> Parser::printStmt() {
     auto expr = expression();
     return std::make_unique<node::PrintStmt>(std::move(expr));
+}
+
+std::unique_ptr<node::Stmt> Parser::ifStmt() {
+    auto condition = comparison();
+
+    // Expect THEN keyword.
+    if (currentToken.type != Token::Type::Keyword || currentToken.text != "THEN") {
+        throw std::runtime_error("Expected 'THEN' after IF condition.");
+    }
+    nextToken();
+ 
+    std::unique_ptr<node::Stmt> thenStmt;
+
+    if (currentToken.type == Token::Type::Keyword) {
+        if (currentToken.text == "PRINT") {
+            nextToken();
+            thenStmt = printStmt();
+        } else if (currentToken.text == "LET") {
+            nextToken();
+            thenStmt = letStmt();
+        } else {
+            throw std::runtime_error("Unsupported statement after THEN: " + currentToken.text);
+        }
+    } else {
+        auto expr = expression();
+        thenStmt = std::make_unique<node::PrintStmt>(std::move(expr));
+    }
+    
+    if (!thenStmt) {
+        throw std::runtime_error("Expected statement after THEN.");
+    }
+
+    return std::make_unique<node::IfStmt>(std::move(condition), std::move(thenStmt));
 }
 
 // Consumes a token of expected type, advances to next token.
